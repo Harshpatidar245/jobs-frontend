@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
 const ApplicationManagement = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [statusUpdate, setStatusUpdate] = useState({ status: '', notes: '' });
+  const [statusUpdate, setStatusUpdate] = useState({ status: "", notes: "" });
   const [updating, setUpdating] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState('');
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchApplications();
@@ -19,12 +19,12 @@ const ApplicationManagement = () => {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      setError('');
-      const response = await axios.get('/applications/my-job-applications');
+      setError("");
+      const response = await axios.get("/applications/my-job-applications");
       setApplications(response.data);
     } catch (error) {
-      console.error('Error fetching applications:', error);
-      setError('Failed to load applications. Please try again.');
+      console.error("Error fetching applications:", error);
+      setError("Failed to load applications. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -32,29 +32,40 @@ const ApplicationManagement = () => {
 
   const handleStatusUpdate = async (applicationId) => {
     if (!statusUpdate.status) {
-      alert('Please select a status');
+      alert("Please select a status");
       return;
     }
 
     setUpdating(true);
     try {
-      const response = await axios.put(`/applications/${applicationId}/status`, statusUpdate);
-      
+      const response = await axios.put(
+        `/applications/${applicationId}/status`,
+        statusUpdate
+      );
+
       if (response.data.message) {
         // Update the application in the list
-        setApplications(applications.map(app => 
-          app._id === applicationId 
-            ? { ...app, status: statusUpdate.status, notes: statusUpdate.notes }
-            : app
-        ));
-        
+        setApplications(
+          applications.map((app) =>
+            app._id === applicationId
+              ? {
+                  ...app,
+                  status: statusUpdate.status,
+                  notes: statusUpdate.notes,
+                }
+              : app
+          )
+        );
+
         setSelectedApplication(null);
-        setStatusUpdate({ status: '', notes: '' });
-        alert('Application status updated successfully!');
+        setStatusUpdate({ status: "", notes: "" });
+        alert("Application status updated successfully!");
       }
     } catch (error) {
-      console.error('Error updating application status:', error);
-      alert(error.response?.data?.message || 'Failed to update application status');
+      console.error("Error updating application status:", error);
+      alert(
+        error.response?.data?.message || "Failed to update application status"
+      );
     } finally {
       setUpdating(false);
     }
@@ -62,50 +73,61 @@ const ApplicationManagement = () => {
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      pending: 'badge-warning',
-      reviewed: 'badge-info',
-      accepted: 'badge-success',
-      rejected: 'badge-danger'
+      pending: "badge-warning",
+      reviewed: "badge-info",
+      accepted: "badge-success",
+      rejected: "badge-danger",
     };
-    return statusMap[status] || 'badge-secondary';
+    return statusMap[status] || "badge-secondary";
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const openApplicationModal = (application) => {
     setSelectedApplication(application);
-    setStatusUpdate({ status: application.status, notes: application.notes || '' });
+    setStatusUpdate({
+      status: application.status,
+      notes: application.notes || "",
+    });
   };
 
   const closeApplicationModal = () => {
     setSelectedApplication(null);
-    setStatusUpdate({ status: '', notes: '' });
+    setStatusUpdate({ status: "", notes: "" });
   };
 
   // Filter applications based on status and search term
-  const filteredApplications = applications.filter(application => {
-    const matchesStatus = filterStatus === 'all' || application.status === filterStatus;
-    const matchesSearch = searchTerm === '' || 
-      application.job?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      application.applicant?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      application.applicant?.email?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+  const filteredApplications = applications.filter((application) => {
+    const matchesStatus =
+      filterStatus === "all" || application.status === filterStatus;
+    const matchesSearch =
+      searchTerm === "" ||
+      application.job?.title
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      application.applicant?.name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      application.applicant?.email
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
     return matchesStatus && matchesSearch;
   });
 
   const getStatusCounts = () => {
     return {
       all: applications.length,
-      pending: applications.filter(app => app.status === 'pending').length,
-      reviewed: applications.filter(app => app.status === 'reviewed').length,
-      accepted: applications.filter(app => app.status === 'accepted').length,
-      rejected: applications.filter(app => app.status === 'rejected').length
+      pending: applications.filter((app) => app.status === "pending").length,
+      reviewed: applications.filter((app) => app.status === "reviewed").length,
+      accepted: applications.filter((app) => app.status === "accepted").length,
+      rejected: applications.filter((app) => app.status === "rejected").length,
     };
   };
 
@@ -180,21 +202,31 @@ const ApplicationManagement = () => {
           <div className="row">
             <div className="col-md-6">
               <label className="form-label">Filter by Status</label>
-              <select 
+              <select
                 className="form-control form-select"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
-                <option value="all">All Applications ({statusCounts.all})</option>
-                <option value="pending">Pending ({statusCounts.pending})</option>
-                <option value="reviewed">Reviewed ({statusCounts.reviewed})</option>
-                <option value="accepted">Accepted ({statusCounts.accepted})</option>
-                <option value="rejected">Rejected ({statusCounts.rejected})</option>
+                <option value="all">
+                  All Applications ({statusCounts.all})
+                </option>
+                <option value="pending">
+                  Pending ({statusCounts.pending})
+                </option>
+                <option value="reviewed">
+                  Reviewed ({statusCounts.reviewed})
+                </option>
+                <option value="accepted">
+                  Accepted ({statusCounts.accepted})
+                </option>
+                <option value="rejected">
+                  Rejected ({statusCounts.rejected})
+                </option>
               </select>
             </div>
             <div className="col-md-6">
               <label className="form-label">Search Applications</label>
-              <input 
+              <input
                 type="text"
                 className="form-control"
                 placeholder="Search by job title, applicant name, or email..."
@@ -212,10 +244,9 @@ const ApplicationManagement = () => {
             <div className="card-body">
               <h3>No Applications Found</h3>
               <p className="text-muted">
-                {applications.length === 0 
-                  ? 'No applications received yet.' 
-                  : 'No applications match your current filters.'
-                }
+                {applications.length === 0
+                  ? "No applications received yet."
+                  : "No applications match your current filters."}
               </p>
               {applications.length === 0 && (
                 <Link to="/create-job" className="btn btn-primary">
@@ -244,26 +275,39 @@ const ApplicationManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredApplications.map(application => (
+                  {filteredApplications.map((application) => (
                     <tr key={application._id}>
                       <td>
-                        <strong>{application.job?.title || 'N/A'}</strong>
+                        <strong>{application.job?.title || "N/A"}</strong>
                         <br />
-                        <small className="text-muted">{application.job?.companyName || 'N/A'}</small>
+                        <small className="text-muted">
+                          {application.job?.companyName || "N/A"}
+                        </small>
                       </td>
-                      <td>{application.applicant?.name || 'N/A'}</td>
+                      <td>{application.applicant?.name || "N/A"}</td>
                       <td>
-                        <div>{application.applicant?.email || 'N/A'}</div>
-                        <small className="text-muted">{application.applicant?.phone || 'N/A'}</small>
+                        <div>{application.applicant?.email || "N/A"}</div>
+                        <small className="text-muted">
+                          {application.applicant?.phone || "N/A"}
+                        </small>
                       </td>
-                      <td>{formatDate(application.appliedDate || application.createdAt)}</td>
                       <td>
-                        <span className={`badge ${getStatusBadge(application.status)}`}>
-                          {application.status?.charAt(0).toUpperCase() + application.status?.slice(1) || 'Unknown'}
+                        {formatDate(
+                          application.appliedDate || application.createdAt
+                        )}
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${getStatusBadge(
+                            application.status
+                          )}`}
+                        >
+                          {application.status?.charAt(0).toUpperCase() +
+                            application.status?.slice(1) || "Unknown"}
                         </span>
                       </td>
                       <td>
-                        <button 
+                        <button
                           className="btn btn-sm btn-primary"
                           onClick={() => openApplicationModal(application)}
                         >
@@ -285,15 +329,22 @@ const ApplicationManagement = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Review Application</h3>
-              <button className="btn btn-sm btn-secondary" onClick={closeApplicationModal}>
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={closeApplicationModal}
+              >
                 ✕
               </button>
             </div>
             <div className="modal-body">
               <div className="mb-4">
-                <h4>{selectedApplication.job?.title || 'Job Title N/A'}</h4>
+                <h4>{selectedApplication.job?.title || "Job Title N/A"}</h4>
                 <p className="text-muted">
-                  Applied on {formatDate(selectedApplication.appliedDate || selectedApplication.createdAt)}
+                  Applied on{" "}
+                  {formatDate(
+                    selectedApplication.appliedDate ||
+                      selectedApplication.createdAt
+                  )}
                 </p>
               </div>
 
@@ -301,16 +352,27 @@ const ApplicationManagement = () => {
                 <h5>Applicant Details</h5>
                 <div className="row">
                   <div className="col-6">
-                    <p><strong>Name:</strong> {selectedApplication.applicant?.name || 'N/A'}</p>
-                    <p><strong>Email:</strong> {selectedApplication.applicant?.email || 'N/A'}</p>
+                    <p>
+                      <strong>Name:</strong>{" "}
+                      {selectedApplication.applicant?.name || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Email:</strong>{" "}
+                      {selectedApplication.applicant?.email || "N/A"}
+                    </p>
                   </div>
                   <div className="col-6">
-                    <p><strong>Phone:</strong> {selectedApplication.applicant?.phone || 'N/A'}</p>
+                    <p>
+                      <strong>Phone:</strong>{" "}
+                      {selectedApplication.applicant?.phone || "N/A"}
+                    </p>
                     {selectedApplication.applicant?.resume && (
                       <p>
-                        <strong>Resume:</strong> 
-                        <a 
-                          href={`http://localhost:5000${selectedApplication.applicant.resume.path}`}
+                        <strong>Resume:</strong>
+                        <a
+                          href={`${import.meta.env.VITE_API_BASE_URL}${
+                            selectedApplication.applicant.resume.path
+                          }`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="ms-2"
@@ -330,7 +392,12 @@ const ApplicationManagement = () => {
                   <select
                     className="form-control form-select"
                     value={statusUpdate.status}
-                    onChange={(e) => setStatusUpdate({ ...statusUpdate, status: e.target.value })}
+                    onChange={(e) =>
+                      setStatusUpdate({
+                        ...statusUpdate,
+                        status: e.target.value,
+                      })
+                    }
                   >
                     <option value="pending">Pending</option>
                     <option value="reviewed">Reviewed</option>
@@ -338,33 +405,38 @@ const ApplicationManagement = () => {
                     <option value="rejected">Rejected</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group">
                   <label className="form-label">Notes (Optional)</label>
                   <textarea
                     className="form-control"
                     rows="3"
                     value={statusUpdate.notes}
-                    onChange={(e) => setStatusUpdate({ ...statusUpdate, notes: e.target.value })}
+                    onChange={(e) =>
+                      setStatusUpdate({
+                        ...statusUpdate,
+                        notes: e.target.value,
+                      })
+                    }
                     placeholder="Add any notes for the applicant..."
                   />
                 </div>
               </div>
 
               <div className="d-flex justify-content-end gap-2">
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  className="btn btn-secondary"
                   onClick={closeApplicationModal}
                   disabled={updating}
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => handleStatusUpdate(selectedApplication._id)}
                   disabled={updating}
                 >
-                  {updating ? 'Updating...' : 'Update Status'}
+                  {updating ? "Updating..." : "Update Status"}
                 </button>
               </div>
             </div>

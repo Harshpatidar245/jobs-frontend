@@ -6,7 +6,9 @@ import axios from "axios";
 // Google Login Button
 const GoogleLoginButton = () => {
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+    window.location.href = `${
+      import.meta.env.VITE_API_BASE_URL
+    }/api/auth/google`;
   };
 
   return (
@@ -152,7 +154,7 @@ const Login = () => {
         setOtpSent(true);
         setOtpTimer(60);
         setSuccess("OTP sent to your phone successfully!");
-        
+
         // Show debug OTP in development
         if (response.data.debug_otp) {
           setSuccess(`OTP sent! Debug OTP: ${response.data.debug_otp}`);
@@ -185,16 +187,22 @@ const Login = () => {
       setLoading(true);
       setError("");
 
-      const response = await axios.post("/auth/verify-email-otp", { email, otp });
+      const response = await axios.post("/auth/verify-email-otp", {
+        email,
+        otp,
+      });
 
       if (response.data.success) {
         const { token, user } = response.data;
         login(token, user);
         setSuccess("Login successful! Redirecting...");
-        
+
         // Redirect based on user role and profile completeness
         setTimeout(() => {
-          if (user.role === 'job_seeker' && (!user.preferences || !user.preferences.jobRoles)) {
+          if (
+            user.role === "job_seeker" &&
+            (!user.preferences || !user.preferences.jobRoles)
+          ) {
             navigate("/preferences");
           } else {
             navigate("/dashboard");
@@ -203,7 +211,8 @@ const Login = () => {
       }
     } catch (err) {
       console.error("OTP verification error:", err);
-      const errorMessage = err.response?.data?.message || "OTP verification failed.";
+      const errorMessage =
+        err.response?.data?.message || "OTP verification failed.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -238,10 +247,13 @@ const Login = () => {
         const { token, user } = response.data;
         login(token, user);
         setSuccess("Login successful! Redirecting...");
-        
+
         // Redirect based on user role and profile completeness
         setTimeout(() => {
-          if (user.role === 'job_seeker' && (!user.preferences || !user.preferences.jobRoles)) {
+          if (
+            user.role === "job_seeker" &&
+            (!user.preferences || !user.preferences.jobRoles)
+          ) {
             navigate("/preferences");
           } else {
             navigate("/dashboard");
@@ -250,7 +262,8 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Phone OTP verification error:", err);
-      const errorMessage = err.response?.data?.message || "OTP verification failed.";
+      const errorMessage =
+        err.response?.data?.message || "OTP verification failed.";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -274,7 +287,10 @@ const Login = () => {
       if (result.success) {
         setSuccess("Login successful! Redirecting...");
         setTimeout(() => {
-          if (result.user.role === 'job_seeker' && (!result.user.preferences || !result.user.preferences.jobRoles)) {
+          if (
+            result.user.role === "job_seeker" &&
+            (!result.user.preferences || !result.user.preferences.jobRoles)
+          ) {
             navigate("/preferences");
           } else {
             navigate("/dashboard");
@@ -292,15 +308,15 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (loginMode === "email_otp") {
       return handleEmailOtpLogin();
     }
-    
+
     if (loginMode === "phone_otp") {
       return handlePhoneOtpLogin();
     }
-    
+
     // Password login
     return handlePasswordLogin();
   };
@@ -350,7 +366,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <GoogleLoginButton />
-            
+
             <div className="divider">
               <span>or continue with</span>
             </div>
@@ -359,7 +375,9 @@ const Login = () => {
             <div className="login-mode-selector">
               <button
                 type="button"
-                className={`mode-btn ${loginMode === "password" ? "active" : ""}`}
+                className={`mode-btn ${
+                  loginMode === "password" ? "active" : ""
+                }`}
                 onClick={() => toggleLoginMode("password")}
               >
                 <span className="mode-icon">🔑</span>
@@ -367,7 +385,9 @@ const Login = () => {
               </button>
               <button
                 type="button"
-                className={`mode-btn ${loginMode === "email_otp" ? "active" : ""}`}
+                className={`mode-btn ${
+                  loginMode === "email_otp" ? "active" : ""
+                }`}
                 onClick={() => toggleLoginMode("email_otp")}
               >
                 <span className="mode-icon">📧</span>
@@ -375,7 +395,9 @@ const Login = () => {
               </button>
               <button
                 type="button"
-                className={`mode-btn ${loginMode === "phone_otp" ? "active" : ""}`}
+                className={`mode-btn ${
+                  loginMode === "phone_otp" ? "active" : ""
+                }`}
                 onClick={() => toggleLoginMode("phone_otp")}
               >
                 <span className="mode-icon">📱</span>

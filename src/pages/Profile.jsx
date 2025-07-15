@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 const Profile = () => {
   const { user } = useAuth();
@@ -13,28 +13,28 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const response = await axios.get('/users/profile');
+      const response = await axios.get("/users/profile");
       setProfileData(response.data.user);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error("Error fetching profile:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const getInitials = (name) => {
     return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
+      .split(" ")
+      .map((word) => word.charAt(0))
+      .join("")
       .toUpperCase();
   };
 
@@ -67,9 +67,15 @@ const Profile = () => {
         <div className="container">
           <div className="profile-avatar">
             {profileData.profilePhoto ? (
-              <img 
-                src={profileData.profilePhoto.startsWith('http') ? profileData.profilePhoto : `http://localhost:5000${profileData.profilePhoto}`}
-                alt="Profile" 
+              <img
+                src={
+                  profileData.profilePhoto.startsWith("http")
+                    ? profileData.profilePhoto
+                    : `${import.meta.env.VITE_API_BASE_URL}${
+                        profileData.profilePhoto
+                      }`
+                }
+                alt="Profile"
                 className="profile-avatar-img"
               />
             ) : (
@@ -78,7 +84,7 @@ const Profile = () => {
           </div>
           <h1>{profileData.name}</h1>
           <p className="text-muted">
-            {profileData.role === 'job_seeker' ? 'Job Seeker' : 'Job Poster'}
+            {profileData.role === "job_seeker" ? "Job Seeker" : "Job Poster"}
             {profileData.companyName && ` at ${profileData.companyName}`}
           </p>
           <div className="mt-3">
@@ -110,7 +116,9 @@ const Profile = () => {
             <div className="info-item">
               <div className="info-label">Role</div>
               <div className="info-value">
-                {profileData.role === 'job_seeker' ? 'Job Seeker' : 'Job Poster'}
+                {profileData.role === "job_seeker"
+                  ? "Job Seeker"
+                  : "Job Poster"}
               </div>
             </div>
             {profileData.companyName && (
@@ -121,37 +129,46 @@ const Profile = () => {
             )}
             <div className="info-item">
               <div className="info-label">Member Since</div>
-              <div className="info-value">{formatDate(profileData.createdAt)}</div>
+              <div className="info-value">
+                {formatDate(profileData.createdAt)}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Job Seeker Specific Information */}
-        {profileData.role === 'job_seeker' && (
+        {profileData.role === "job_seeker" && (
           <>
             {/* Job Preferences */}
             {profileData.preferences && (
               <div className="profile-section">
                 <h3>Job Preferences</h3>
                 <div className="info-grid">
-                  {profileData.preferences.jobRoles && profileData.preferences.jobRoles.length > 0 && (
-                    <div className="info-item">
-                      <div className="info-label">Job Roles of Interest</div>
-                      <div className="info-value">
-                        <div className="skills-list">
-                          {profileData.preferences.jobRoles.map((role, index) => (
-                            <span key={index} className="skill-tag">{role}</span>
-                          ))}
+                  {profileData.preferences.jobRoles &&
+                    profileData.preferences.jobRoles.length > 0 && (
+                      <div className="info-item">
+                        <div className="info-label">Job Roles of Interest</div>
+                        <div className="info-value">
+                          <div className="skills-list">
+                            {profileData.preferences.jobRoles.map(
+                              (role, index) => (
+                                <span key={index} className="skill-tag">
+                                  {role}
+                                </span>
+                              )
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   {profileData.preferences.jobType && (
                     <div className="info-item">
                       <div className="info-label">Preferred Work Type</div>
                       <div className="info-value">
-                        {profileData.preferences.jobType.charAt(0).toUpperCase() + 
-                         profileData.preferences.jobType.slice(1)}
+                        {profileData.preferences.jobType
+                          .charAt(0)
+                          .toUpperCase() +
+                          profileData.preferences.jobType.slice(1)}
                       </div>
                     </div>
                   )}
@@ -159,35 +176,48 @@ const Profile = () => {
                     <div className="info-item">
                       <div className="info-label">Job Level</div>
                       <div className="info-value">
-                        {profileData.preferences.jobLevel.charAt(0).toUpperCase() + 
-                         profileData.preferences.jobLevel.slice(1)} Level
+                        {profileData.preferences.jobLevel
+                          .charAt(0)
+                          .toUpperCase() +
+                          profileData.preferences.jobLevel.slice(1)}{" "}
+                        Level
                       </div>
                     </div>
                   )}
-                  {profileData.preferences.preferredLocations && profileData.preferences.preferredLocations.length > 0 && (
-                    <div className="info-item">
-                      <div className="info-label">Preferred Locations</div>
-                      <div className="info-value">
-                        <div className="skills-list">
-                          {profileData.preferences.preferredLocations.map((location, index) => (
-                            <span key={index} className="skill-tag">{location}</span>
-                          ))}
+                  {profileData.preferences.preferredLocations &&
+                    profileData.preferences.preferredLocations.length > 0 && (
+                      <div className="info-item">
+                        <div className="info-label">Preferred Locations</div>
+                        <div className="info-value">
+                          <div className="skills-list">
+                            {profileData.preferences.preferredLocations.map(
+                              (location, index) => (
+                                <span key={index} className="skill-tag">
+                                  {location}
+                                </span>
+                              )
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                  {profileData.preferences.skills && profileData.preferences.skills.length > 0 && (
-                    <div className="info-item">
-                      <div className="info-label">Skills</div>
-                      <div className="info-value">
-                        <div className="skills-list">
-                          {profileData.preferences.skills.map((skill, index) => (
-                            <span key={index} className="skill-tag">{skill}</span>
-                          ))}
+                    )}
+                  {profileData.preferences.skills &&
+                    profileData.preferences.skills.length > 0 && (
+                      <div className="info-item">
+                        <div className="info-label">Skills</div>
+                        <div className="info-value">
+                          <div className="skills-list">
+                            {profileData.preferences.skills.map(
+                              (skill, index) => (
+                                <span key={index} className="skill-tag">
+                                  {skill}
+                                </span>
+                              )
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </div>
             )}
@@ -199,17 +229,23 @@ const Profile = () => {
                 <div className="info-grid">
                   <div className="info-item">
                     <div className="info-label">File Name</div>
-                    <div className="info-value">{profileData.resume.filename}</div>
+                    <div className="info-value">
+                      {profileData.resume.filename}
+                    </div>
                   </div>
                   <div className="info-item">
                     <div className="info-label">Upload Date</div>
-                    <div className="info-value">{formatDate(profileData.resume.uploadDate)}</div>
+                    <div className="info-value">
+                      {formatDate(profileData.resume.uploadDate)}
+                    </div>
                   </div>
                 </div>
                 <div className="mt-3">
-                  <a 
-                    href={`http://localhost:5000${profileData.resume.path}`} 
-                    target="_blank" 
+                  <a
+                    href={`${import.meta.env.VITE_API_BASE_URL}${
+                      profileData.resume.path
+                    }`}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-secondary"
                   >
@@ -228,14 +264,20 @@ const Profile = () => {
             <div className="info-item">
               <div className="info-label">Account Status</div>
               <div className="info-value">
-                <span className={`badge ${profileData.isActive ? 'badge-success' : 'badge-danger'}`}>
-                  {profileData.isActive ? 'Active' : 'Inactive'}
+                <span
+                  className={`badge ${
+                    profileData.isActive ? "badge-success" : "badge-danger"
+                  }`}
+                >
+                  {profileData.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
             </div>
             <div className="info-item">
               <div className="info-label">Last Updated</div>
-              <div className="info-value">{formatDate(profileData.updatedAt)}</div>
+              <div className="info-value">
+                {formatDate(profileData.updatedAt)}
+              </div>
             </div>
           </div>
         </div>
